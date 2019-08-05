@@ -1,6 +1,7 @@
 package com.cleanup.todoc.ui;
 
 import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,6 +31,7 @@ import com.cleanup.todoc.model.Task;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Observer;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -43,8 +45,6 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
     private List<Task> tasks;
     private TaskAdapter adapter;
 
-    @NonNull
-    private SortMethod sortMethod = SortMethod.NONE;
     @Nullable
     public AlertDialog dialog = null;
     @Nullable
@@ -58,8 +58,6 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
     @NonNull
     private TextView lblNoTasks;
 
-    Context mContext;
-    LifecycleOwner mLifecycleOwner;
 
     public MainActivity() {
     }
@@ -72,12 +70,12 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
     @Override
     public void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLifecycleOwner = this;
         listTasks = findViewById(R.id.list_tasks);
         lblNoTasks = findViewById(R.id.lbl_no_task);
 
         this.configureViewModel();
-        this.mTaskViewModel.getAllTasks().observe(mLifecycleOwner,this::updateTaskList);
+
+        this.mTaskViewModel.getAllTasks(SortMethod.NONE.toString()).observe(this, this::updateTaskList);
 
         this.configureRecyclerView();
         findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
@@ -91,27 +89,28 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        if (id == R.id.filter_alphabetical) {
-            sortMethod = SortMethod.ALPHABETICAL;
-        } else if (id == R.id.filter_alphabetical_inverted) {
-            sortMethod = SortMethod.ALPHABETICAL_INVERTED;
-        } else if (id == R.id.filter_oldest_first) {
-            sortMethod = SortMethod.OLD_FIRST;
-        } else if (id == R.id.filter_recent_first) {
-            sortMethod = SortMethod.RECENT_FIRST;
+        this.mTaskViewModel.getAllTasks("").removeObservers(this);
+        switch (item.getItemId()){
+            case R.id.filter_alphabetical :
+                this.mTaskViewModel.getAllTasks(SortMethod.ALPHABETICAL.toString()).observe(this, this::updateTaskList);
+                break;
+            case R.id.filter_alphabetical_inverted :
+                this.mTaskViewModel.getAllTasks(SortMethod.ALPHABETICAL_INVERTED.toString()).observe(this, this::updateTaskList);
+                break;
+            case R.id.filter_oldest_first :
+                this.mTaskViewModel.getAllTasks(SortMethod.OLD_FIRST.toString()).observe(this, this::updateTaskList);
+                break;
+            case R.id.filter_recent_first :
+                this.mTaskViewModel.getAllTasks(SortMethod.RECENT_FIRST.toString()).observe(this, this::updateTaskList);
+                break;
         }
-
-        updateTasks();
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onClickDeleteButton(long taskId) {
         mTaskViewModel.deleteTask(taskId);
-        updateTasks();
     }
 
     private void configureRecyclerView() {
@@ -184,22 +183,7 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
         } else {
             lblNoTasks.setVisibility(View.GONE);
             listTasks.setVisibility(View.VISIBLE);
-            switch (sortMethod) {
-                case ALPHABETICAL:
-                    Collections.sort(this.tasks, new Task.TaskAZComparator());
-                    break;
-                case ALPHABETICAL_INVERTED:
-                    Collections.sort(this.tasks, new Task.TaskZAComparator());
-                    break;
-                case RECENT_FIRST:
-                    Collections.sort(this.tasks, new Task.TaskRecentComparator());
-                    break;
-                case OLD_FIRST:
-                    Collections.sort(this.tasks, new Task.TaskOldComparator());
-                    break;
-
-            }
-            adapter.updateData(this.tasks);
+            adapter.updateData(tasks);
         }
     }
 

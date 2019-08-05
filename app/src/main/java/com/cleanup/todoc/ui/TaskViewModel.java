@@ -36,7 +36,7 @@ public class TaskViewModel extends ViewModel {
         }
 
         if (this.mTasks == null){
-            this.mTasks = mTaskDataRepository.getAllTask();
+            this.mTasks = mTaskDataRepository.getAllTask("NONE");
         }
     }
 
@@ -53,8 +53,8 @@ public class TaskViewModel extends ViewModel {
     }
 
 
-    public LiveData<List<Task>> getAllTasks (){
-        return this.mTaskDataRepository.getAllTask();
+    public LiveData<List<Task>> getAllTasks (String sortBy){
+        return this.mTaskDataRepository.getAllTask(sortBy);
     }
 
     public void createTask(Task task){

@@ -16,8 +16,19 @@ public class TaskDataRepository {
     }
 
     // GET ALL
-    public LiveData<List<Task>> getAllTask() {
-        return this.mTaskDao.getTasks();
+    public LiveData<List<Task>> getAllTask(String sortBy) {
+        switch (sortBy){
+            case "ALPHABETICAL" :
+                return this.mTaskDao.getTasksNameASC();
+            case "ALPHABETICAL_INVERTED":
+                return this.mTaskDao.getTasksNameDESC();
+            case "RECENT_FIRST" :
+                return this.mTaskDao.getTasksTimeASC();
+            case "OLD_FIRST" :
+                return this.mTaskDao.getTasksTimeDESC();
+            default:
+                return this.mTaskDao.getTasks();
+        }
     }
 
     // GET With Id

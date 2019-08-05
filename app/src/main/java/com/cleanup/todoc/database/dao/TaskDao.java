@@ -16,6 +16,18 @@ public interface TaskDao {
     @Query("SELECT * FROM Task")
     LiveData<List<Task>> getTasks();
 
+    @Query("SELECT * FROM Task ORDER BY name ASC")
+    LiveData<List<Task>> getTasksNameASC();
+
+    @Query("SELECT * FROM Task ORDER BY name DESC")
+    LiveData<List<Task>> getTasksNameDESC();
+
+    @Query("SELECT * FROM Task ORDER BY creationTimestamp DESC")
+    LiveData<List<Task>> getTasksTimeASC();
+
+    @Query("SELECT * FROM Task ORDER BY creationTimestamp ASC")
+    LiveData<List<Task>> getTasksTimeDESC();
+
     @Query("SELECT * FROM Task WHERE projectId = :projectId")
     LiveData<List<Task>> getTasks(Long projectId);
 
