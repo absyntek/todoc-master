@@ -15,7 +15,7 @@ public class TaskDataRepository {
         mTaskDao = taskDao;
     }
 
-    // GET ALL
+    // GET ALL WITH SORT BY
     public LiveData<List<Task>> getAllTask(String sortBy) {
         switch (sortBy){
             case "ALPHABETICAL" :

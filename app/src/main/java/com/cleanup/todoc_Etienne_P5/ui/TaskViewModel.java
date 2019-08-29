@@ -52,7 +52,6 @@ public class TaskViewModel extends ViewModel {
         return mProjectDataRepository.getSpecProject(projectId);
     }
 
-
     public LiveData<List<Task>> getAllTasks (String sortBy){
         return this.mTaskDataRepository.getAllTask(sortBy);
     }
