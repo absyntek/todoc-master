@@ -53,8 +53,7 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
     private TextView lblNoTasks;
 
 
-    public MainActivity() {
-    }
+    public MainActivity() { }
 
     @Override
     public int getLayoutContentViewID() {
