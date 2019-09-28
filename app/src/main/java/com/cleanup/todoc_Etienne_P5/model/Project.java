@@ -41,29 +41,28 @@ public class Project {
         this.color = color;
     }
 
+    // ------- GETTERS -------
     public long getId() {
         return id;
     }
-
     @NonNull public String getName() {
         return name;
     }
-
     @ColorInt public int getColor() {
         return color;
     }
 
+    // ------- GETTERS -------
     public void setId(long id) {
         this.id = id;
     }
-
     public void setName(@NonNull String name) {
         this.name = name;
     }
-
     public void setColor(int color) {
         this.color = color;
     }
+
 
     @Override
     @NonNull
