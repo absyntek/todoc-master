@@ -18,6 +18,8 @@ public class TaskViewModel extends ViewModel {
     private final ProjectDataRepository mProjectDataRepository;
     private final Executor mExecutor;
 
+    private String sortBy = "NONE";
+
     private List<Project> mProjects;
 
     @Nullable
@@ -29,18 +31,18 @@ public class TaskViewModel extends ViewModel {
         mExecutor = executor;
     }
 
-    public void initLists (){
+    void initLists(){
 
         if (mProjects == null){
             new GetProjectListmod().execute();
         }
 
         if (this.mTasks == null){
-            this.mTasks = mTaskDataRepository.getAllTask("NONE");
+            this.mTasks = mTaskDataRepository.getAllTask(sortBy);
         }
     }
 
-    public List<Project> getAllPro(){
+    List<Project> getAllPro(){
         return this.mProjects;
     }
 
@@ -48,21 +50,21 @@ public class TaskViewModel extends ViewModel {
         return mProjectDataRepository.getAllProjects();
     }
 
-    public Project getSpecProject(Long projectId) {
+    Project getSpecProject(Long projectId) {
         return mProjectDataRepository.getSpecProject(projectId);
     }
 
-    public LiveData<List<Task>> getAllTasks (String sortBy){
+    LiveData<List<Task>> getAllTasks(String sortBy){
         return this.mTaskDataRepository.getAllTask(sortBy);
     }
 
-    public void createTask(Task task){
+    void createTask(Task task){
         mExecutor.execute(() ->{
             mTaskDataRepository.createItem(task);
         });
     }
 
-    public void deleteTask(long taskId){
+    void deleteTask(long taskId){
         mExecutor.execute(() -> {
             mTaskDataRepository.deleteItem(taskId);
         });
@@ -72,6 +74,14 @@ public class TaskViewModel extends ViewModel {
         mExecutor.execute(() -> {
             mTaskDataRepository.updateItem(task);
         });
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
     }
 
     private class GetProjectListmod extends AsyncTask<Void, Void, List<Project>> {

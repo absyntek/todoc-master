@@ -42,6 +42,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     }
 
+    @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
@@ -60,12 +61,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         return this.tasks.size();
     }
 
-    public void updateData(List<Task> tasks){
+    void updateData(List<Task> tasks){
         this.tasks = tasks;
         this.notifyDataSetChanged();
     }
 
 
+    /**
+     *  ViewHolder
+     */
     public class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private final AppCompatImageView imgProject;
@@ -78,7 +82,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         private long taskId;
 
-        public TaskViewHolder(View itemView) {
+        TaskViewHolder(View itemView) {
             super(itemView);
             imgProject = itemView.findViewById(R.id.img_project);
             lblTaskName = itemView.findViewById(R.id.lbl_task_name);
@@ -106,6 +110,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             if (callback != null) callback.onClickDeleteButton(this.taskId);
         }
 
+        /**
+         * AssyncTask
+         * Update Project fields when finish
+         */
         private class MyAssyncTask extends AsyncTask <Long, Void, Project> {
             @Override
             protected Project doInBackground(Long... longs) {
@@ -118,8 +126,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         }
     }
-
-
 }
 
 

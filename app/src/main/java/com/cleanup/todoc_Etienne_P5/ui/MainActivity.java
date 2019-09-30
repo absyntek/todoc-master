@@ -68,7 +68,7 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
 
         this.configureViewModel();
 
-        this.mTaskViewModel.getAllTasks(SortMethod.NONE.toString()).observe(this, this::updateTaskList);
+        this.mTaskViewModel.getAllTasks(mTaskViewModel.getSortBy()).observe(this, this::updateTaskList);
 
         this.configureRecyclerView();
         findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
@@ -86,16 +86,20 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
         this.mTaskViewModel.getAllTasks("").removeObservers(this);
         switch (item.getItemId()){
             case R.id.filter_alphabetical :
-                this.mTaskViewModel.getAllTasks(SortMethod.ALPHABETICAL.toString()).observe(this, this::updateTaskList);
+                mTaskViewModel.setSortBy(SortMethod.ALPHABETICAL.toString());
+                this.mTaskViewModel.getAllTasks(mTaskViewModel.getSortBy()).observe(this, this::updateTaskList);
                 break;
             case R.id.filter_alphabetical_inverted :
-                this.mTaskViewModel.getAllTasks(SortMethod.ALPHABETICAL_INVERTED.toString()).observe(this, this::updateTaskList);
+                mTaskViewModel.setSortBy(SortMethod.ALPHABETICAL_INVERTED.toString());
+                this.mTaskViewModel.getAllTasks(mTaskViewModel.getSortBy()).observe(this, this::updateTaskList);
                 break;
             case R.id.filter_oldest_first :
-                this.mTaskViewModel.getAllTasks(SortMethod.OLD_FIRST.toString()).observe(this, this::updateTaskList);
+                mTaskViewModel.setSortBy(SortMethod.OLD_FIRST.toString());
+                this.mTaskViewModel.getAllTasks(mTaskViewModel.getSortBy()).observe(this, this::updateTaskList);
                 break;
             case R.id.filter_recent_first :
-                this.mTaskViewModel.getAllTasks(SortMethod.RECENT_FIRST.toString()).observe(this, this::updateTaskList);
+                mTaskViewModel.setSortBy(SortMethod.RECENT_FIRST.toString());
+                this.mTaskViewModel.getAllTasks(mTaskViewModel.getSortBy()).observe(this, this::updateTaskList);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -113,9 +117,45 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
     }
 
     private void configureViewModel(){
-        ViewModelFactory mViewModelFactory = Injection.provideViewModelFactory(this);
+        ViewModelFactory mViewModelFactory = Injection.provideViewModelFactory(this);  // create database and provide viewmodel
         this.mTaskViewModel = ViewModelProviders.of(this, mViewModelFactory).get(TaskViewModel.class);
         this.mTaskViewModel.initLists();
+    }
+
+    private void showAddTaskDialog() {
+        final AlertDialog dialog = getAddTaskDialog();
+
+        dialog.show();
+
+        dialogEditText = dialog.findViewById(R.id.txt_task_name);
+        dialogSpinner = dialog.findViewById(R.id.project_spinner);
+
+        populateDialogSpinner(mTaskViewModel.getAllPro());
+    }
+
+    @NonNull
+    private AlertDialog getAddTaskDialog() {
+        final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Dialog);
+
+        alertBuilder.setTitle(R.string.add_task);
+        alertBuilder.setView(R.layout.dialog_add_task);
+        alertBuilder.setPositiveButton(R.string.add, null);
+        alertBuilder.setOnDismissListener(dialogInterface -> {
+            dialogEditText = null;
+            dialogSpinner = null;
+            dialog = null;
+        });
+
+        dialog = alertBuilder.create();
+
+        // This instead of listener to positive button in order to avoid automatic dismiss
+        assert dialog != null;
+        dialog.setOnShowListener(dialogInterface -> {
+            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> onPositiveButtonClick(dialog));
+        });
+
+        return dialog;
     }
 
     private void onPositiveButtonClick(DialogInterface dialogInterface) {
@@ -158,17 +198,6 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
         }
     }
 
-    private void showAddTaskDialog() {
-        final AlertDialog dialog = getAddTaskDialog();
-
-        dialog.show();
-
-        dialogEditText = dialog.findViewById(R.id.txt_task_name);
-        dialogSpinner = dialog.findViewById(R.id.project_spinner);
-
-        populateDialogSpinner(mTaskViewModel.getAllPro());
-    }
-
     private void updateTasks() {
         if (this.tasks == null || this.tasks.size() == 0) {
             lblNoTasks.setVisibility(View.VISIBLE);
@@ -178,31 +207,6 @@ public class MainActivity extends BaseActivity implements TaskAdapter.Listener {
             listTasks.setVisibility(View.VISIBLE);
             adapter.updateData(tasks);
         }
-    }
-
-    @NonNull
-    private AlertDialog getAddTaskDialog() {
-        final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Dialog);
-
-        alertBuilder.setTitle(R.string.add_task);
-        alertBuilder.setView(R.layout.dialog_add_task);
-        alertBuilder.setPositiveButton(R.string.add, null);
-        alertBuilder.setOnDismissListener(dialogInterface -> {
-            dialogEditText = null;
-            dialogSpinner = null;
-            dialog = null;
-        });
-
-        dialog = alertBuilder.create();
-
-        // This instead of listener to positive button in order to avoid automatic dismiss
-        assert dialog != null;
-        dialog.setOnShowListener(dialogInterface -> {
-            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> onPositiveButtonClick(dialog));
-        });
-
-        return dialog;
     }
 
     private void populateDialogSpinner(List<Project> projects) {

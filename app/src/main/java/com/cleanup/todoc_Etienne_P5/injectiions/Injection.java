@@ -11,17 +11,17 @@ import java.util.concurrent.Executors;
 
 public class Injection {
 
-    public static TaskDataRepository provideTaskDataSource(Context context){
+    private static TaskDataRepository provideTaskDataSource(Context context){
         TodocDatabase database = TodocDatabase.getInstance(context);
         return new TaskDataRepository(database.mTaskDao());
     }
 
-    public static ProjectDataRepository provideProjectDataSource(Context context){
+    private static ProjectDataRepository provideProjectDataSource(Context context){
         TodocDatabase database = TodocDatabase.getInstance(context);
         return new ProjectDataRepository(database.mProjetDao());
     }
 
-    public static Executor provideExecutor(){ return Executors.newSingleThreadExecutor(); }
+    private static Executor provideExecutor(){ return Executors.newSingleThreadExecutor(); }
 
     public static ViewModelFactory provideViewModelFactory(Context context) {
         TaskDataRepository dataSourceTask = provideTaskDataSource(context);

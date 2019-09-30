@@ -52,7 +52,7 @@ public class Project {
         return color;
     }
 
-    // ------- GETTERS -------
+    // ------- SETTERS -------
     public void setId(long id) {
         this.id = id;
     }
